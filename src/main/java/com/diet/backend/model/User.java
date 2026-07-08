@@ -36,6 +36,32 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    // Danışan Bilgileri (ROLE_USER için geçerli)
+    private Double height;
+    private Double currentWeight;
+    private Double targetWeight;
+
+    @Enumerated(EnumType.STRING)
+    private ClientCategory category;
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dietitian_id")
+    private User dietitian;
+
+    // GLP-1 Takip Parametreleri
+    private String glp1InjectionDay;
+    private String glp1Dosage;
+
+    // Lipödem Takip Parametreleri
+    private Integer lipedemaStage;
+    private Boolean antiInflammatoryCompliant;
+
+    // Hormonal Takip Parametreleri
+    private String hormoneTargetCycle;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));

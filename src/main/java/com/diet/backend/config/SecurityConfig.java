@@ -37,10 +37,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // H2 Konsolu için gerekli
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
