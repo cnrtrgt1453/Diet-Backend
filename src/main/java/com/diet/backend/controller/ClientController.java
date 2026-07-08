@@ -147,11 +147,19 @@ public class ClientController {
     // Danışanın ölçüm geçmişini getirir
     @GetMapping("/{clientId}/measurements")
     public ResponseEntity<?> getClientMeasurements(@PathVariable Long clientId) {
-        User dietitian = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedInUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         
         Optional<User> clientOpt = userRepository.findById(clientId);
-        if (clientOpt.isEmpty() || !clientOpt.get().getDietitian().getId().equals(dietitian.getId())) {
+        if (clientOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
+        }
+
+        User client = clientOpt.get();
+        boolean isDietitian = loggedInUser.getRole() == Role.ROLE_DIETITIAN && client.getDietitian() != null && client.getDietitian().getId().equals(loggedInUser.getId());
+        boolean isSelf = loggedInUser.getId().equals(clientId);
+
+        if (!isDietitian && !isSelf) {
+            return ResponseEntity.status(403).body("Bu verilere erişim yetkiniz bulunmuyor.");
         }
 
         List<Measurement> measurements = measurementRepository.findByClientIdOrderByDateDesc(clientId);
