@@ -8,6 +8,7 @@ import com.diet.backend.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -22,6 +23,18 @@ public class AuthService {
     private final MeasurementRepository measurementRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${app.dietitian.email}")
+    private String dietitianEmail;
+
+    private User getOrCreateDietitian() {
+        return userRepository.findByEmail(dietitianEmail)
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .email(dietitianEmail)
+                        .name("Diyetisyen Şüheda Terat")
+                        .role(Role.ROLE_DIETITIAN)
+                        .build()));
+    }
 
     public String loginWithGoogle(String idToken) {
         String email;
@@ -96,23 +109,32 @@ public class AuthService {
 
         if (userOptional.isPresent()) {
             user = userOptional.get();
+            // Eğer rolü kullanıcı (danışan) ise ve diyetisyeni yoksa, otomatik olarak ata
+            if (user.getRole() == Role.ROLE_USER && user.getDietitian() == null) {
+                user.setDietitian(getOrCreateDietitian());
+            }
             user.setProvider(provider);
             user.setProviderId(providerId);
             user.setName(name);
             user = userRepository.save(user);
         } else {
             Role userRole = Role.ROLE_USER;
-            if (email.contains("dietitian") || email.equals("test.google@dietapp.com")) {
+            if (email.equals(dietitianEmail)) {
                 userRole = Role.ROLE_DIETITIAN;
             }
 
-            user = User.builder()
+            User.UserBuilder userBuilder = User.builder()
                     .email(email)
                     .name(name)
                     .provider(provider)
                     .providerId(providerId)
-                    .role(userRole)
-                    .build();
+                    .role(userRole);
+
+            if (userRole == Role.ROLE_USER) {
+                userBuilder.dietitian(getOrCreateDietitian());
+            }
+
+            user = userBuilder.build();
             user = userRepository.save(user);
 
             // Diyetisyen hesabı ilk kez yaratıldığında hazır test verilerini (danışanlar, diyetler, ölçümler) yükle
