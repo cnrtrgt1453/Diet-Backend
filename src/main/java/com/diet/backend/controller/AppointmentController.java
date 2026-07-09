@@ -7,6 +7,8 @@ import com.diet.backend.model.Role;
 import com.diet.backend.repository.AppointmentRepository;
 import com.diet.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import com.diet.backend.event.AppointmentStatusChangedEvent;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ public class AppointmentController {
 
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 1. Danışan: Yeni randevu talebi oluşturur
     @PostMapping
@@ -99,6 +102,7 @@ public class AppointmentController {
 
         appointment.setStatus(status);
         Appointment saved = appointmentRepository.save(appointment);
+        eventPublisher.publishEvent(new AppointmentStatusChangedEvent(saved));
         return ResponseEntity.ok(saved);
     }
 }

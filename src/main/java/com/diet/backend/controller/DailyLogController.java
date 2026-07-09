@@ -32,8 +32,8 @@ public class DailyLogController {
             return ResponseEntity.badRequest().body("Sadece danışanlar günlük durum kaydı girebilir.");
         }
 
-        LocalDate today = LocalDate.now();
-        Optional<DailyLog> existingLogOpt = dailyLogRepository.findByClientIdAndLogDate(client.getId(), today);
+        LocalDate logDate = logRequest.getLogDate() != null ? logRequest.getLogDate() : LocalDate.now();
+        Optional<DailyLog> existingLogOpt = dailyLogRepository.findByClientIdAndLogDate(client.getId(), logDate);
         
         DailyLog dailyLog;
         if (existingLogOpt.isPresent()) {
@@ -49,7 +49,7 @@ public class DailyLogController {
         } else {
             dailyLog = DailyLog.builder()
                     .client(client)
-                    .logDate(today)
+                    .logDate(logDate)
                     .waterIntakeMl(logRequest.getWaterIntakeMl())
                     .glp1SideEffectLevel(logRequest.getGlp1SideEffectLevel())
                     .glp1SideEffects(logRequest.getGlp1SideEffects())

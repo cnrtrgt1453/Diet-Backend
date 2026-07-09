@@ -5,6 +5,8 @@ import com.diet.backend.repository.UserRepository;
 import com.diet.backend.repository.DietPlanRepository;
 import com.diet.backend.repository.MeasurementRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import com.diet.backend.event.DietPlanAssignedEvent;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ public class ClientController {
     private final UserRepository userRepository;
     private final DietPlanRepository dietPlanRepository;
     private final MeasurementRepository measurementRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     // Giriş yapan diyetisyenin tüm danışanlarını getirir
     @GetMapping
@@ -235,6 +238,7 @@ public class ClientController {
                 .build();
 
         DietPlan saved = dietPlanRepository.save(newDietPlan);
+        eventPublisher.publishEvent(new DietPlanAssignedEvent(saved));
         return ResponseEntity.ok(saved);
     }
 }
