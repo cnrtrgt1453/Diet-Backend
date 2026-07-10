@@ -62,6 +62,17 @@ public class User implements UserDetails {
     // Hormonal Takip Parametreleri
     private String hormoneTargetCycle;
 
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus dietitianApplicationStatus;
+
+    @Column(columnDefinition = "TEXT")
+    private String dietitianRejectionReason;
+
+    private String instagramUrl;
+    private String linkedinUrl;
+    private String youtubeUrl;
+    private String profilePictureUrl;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));

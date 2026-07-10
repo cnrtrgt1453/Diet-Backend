@@ -29,8 +29,21 @@ public class UserController {
         User user = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
+        if (user.getRole() == com.diet.backend.model.Role.ROLE_DIETITIAN) {
+            if (request.getName() != null) user.setName(request.getName());
+            user.setInstagramUrl(request.getInstagramUrl());
+            user.setLinkedinUrl(request.getLinkedinUrl());
+            user.setYoutubeUrl(request.getYoutubeUrl());
+            user.setProfilePictureUrl(request.getProfilePictureUrl());
+            if (request.getNotes() != null) user.setNotes(request.getNotes());
+            
+            User savedUser = userRepository.save(user);
+            return ResponseEntity.ok(savedUser);
+        }
+
         boolean isFirstWeight = user.getCurrentWeight() == null;
 
+        if (request.getName() != null) user.setName(request.getName());
         user.setHeight(request.getHeight());
         user.setCurrentWeight(request.getCurrentWeight());
         user.setTargetWeight(request.getTargetWeight());

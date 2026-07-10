@@ -18,4 +18,10 @@ public class ProfileUpdateRequest {
     private Integer lipedemaStage;
     private Boolean antiInflammatoryCompliant;
     private String hormoneTargetCycle;
+    private String name;
+    private String instagramUrl;
+    private String linkedinUrl;
+    private String youtubeUrl;
+    private String notes;
+    private String profilePictureUrl;
 }

@@ -22,6 +22,8 @@ public class AuthService {
     private final DietPlanRepository dietPlanRepository;
     private final MeasurementRepository measurementRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final org.springframework.mail.javamail.JavaMailSender mailSender;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${app.dietitian.email}")
@@ -31,8 +33,14 @@ public class AuthService {
         return userRepository.findByEmail(dietitianEmail)
                 .orElseGet(() -> userRepository.save(User.builder()
                         .email(dietitianEmail)
+                        .password(passwordEncoder.encode("admin123"))
                         .name("Diyetisyen Şüheda Terat")
                         .role(Role.ROLE_DIETITIAN)
+                        .notes("İzmir / Alsancak Kliniği")
+                        .instagramUrl("https://instagram.com/suhedaterat")
+                        .linkedinUrl("https://linkedin.com/in/suhedaterat")
+                        .youtubeUrl("https://youtube.com/@suhedaterat")
+                        .profilePictureUrl("https://images.unsplash.com/photo-1594824813573-246434de83fb?q=80&w=256&auto=format&fit=crop")
                         .build()));
     }
 
@@ -109,10 +117,6 @@ public class AuthService {
 
         if (userOptional.isPresent()) {
             user = userOptional.get();
-            // Eğer rolü kullanıcı (danışan) ise ve diyetisyeni yoksa, otomatik olarak ata
-            if (user.getRole() == Role.ROLE_USER && user.getDietitian() == null) {
-                user.setDietitian(getOrCreateDietitian());
-            }
             user.setProvider(provider);
             user.setProviderId(providerId);
             user.setName(name);
@@ -129,10 +133,6 @@ public class AuthService {
                     .provider(provider)
                     .providerId(providerId)
                     .role(userRole);
-
-            if (userRole == Role.ROLE_USER) {
-                userBuilder.dietitian(getOrCreateDietitian());
-            }
 
             user = userBuilder.build();
             user = userRepository.save(user);
@@ -269,5 +269,46 @@ public class AuthService {
                 .targetCalories(1400)
                 .completed(false)
                 .build());
+    }
+
+    public String loginWithEmailAndPassword(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("E-posta adresi veya şifre hatalı."));
+
+        if (user.getPassword() == null || !passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("E-posta adresi veya şifre hatalı.");
+        }
+
+        // Eğer rolü diyetisyen değilse ve bekleyen/reddedilen bir başvurusu da yoksa giriş yapamasın!
+        if (user.getRole() != Role.ROLE_DIETITIAN && user.getDietitianApplicationStatus() == null) {
+            throw new RuntimeException("Bu giriş alanı yalnızca diyetisyenler içindir.");
+        }
+
+        return jwtTokenProvider.generateTokenFromUsername(user.getEmail());
+    }
+
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı."));
+
+        try {
+            org.springframework.mail.SimpleMailMessage message = new org.springframework.mail.SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("DietApp - Şifre Sıfırlama Talebi");
+            message.setText("Merhaba " + user.getName() + ",\n\n" +
+                    "Hesabınızın şifresini sıfırlamak için aşağıdaki bağlantıyı kullanabilirsiniz:\n" +
+                    "http://localhost:8080/api/v1/auth/reset-password?email=" + email + "\n\n" +
+                    "Eğer bu talebi siz yapmadıysanız lütfen bu e-postayı dikkate almayınız.\n\n" +
+                    "Sağlıklı günler dileriz,\nDietApp Ekibi");
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("E-posta gönderimi başarısız oldu: " + e.getMessage());
+            System.out.println("==================================================");
+            System.out.println("MOCK MAIL SENDER - ŞİFRE SIFIRLAMA TALEBİ");
+            System.out.println("Alıcı: " + email);
+            System.out.println("Bağlantı: http://localhost:8080/api/v1/auth/reset-password?email=" + email);
+            System.out.println("==================================================");
+            throw new RuntimeException("E-posta gönderilemedi. Lütfen application.properties dosyasındaki SMTP / şifre ayarlarını kontrol ediniz. Hata: " + e.getMessage());
+        }
     }
 }

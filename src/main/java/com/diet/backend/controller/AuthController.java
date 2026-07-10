@@ -29,4 +29,25 @@ public class AuthController {
                 .accessToken(token)
                 .build());
     }
+    @PostMapping("/login")
+    public ResponseEntity<?> loginWithEmailAndPassword(@RequestBody com.diet.backend.dto.LoginRequest loginRequest) {
+        try {
+            String token = authService.loginWithEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+            return ResponseEntity.ok(com.diet.backend.dto.JwtAuthResponse.builder()
+                    .accessToken(token)
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        try {
+            authService.forgotPassword(email);
+            return ResponseEntity.ok("Şifre sıfırlama bağlantısı e-posta adresinize başarıyla gönderildi.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
