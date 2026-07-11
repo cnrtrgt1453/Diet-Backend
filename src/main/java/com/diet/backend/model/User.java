@@ -73,6 +73,8 @@ public class User implements UserDetails {
     private String youtubeUrl;
     private String profilePictureUrl;
 
+    private String fcmToken;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));

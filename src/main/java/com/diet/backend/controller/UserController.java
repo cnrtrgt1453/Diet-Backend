@@ -68,4 +68,20 @@ public class UserController {
 
         return ResponseEntity.ok(savedUser);
     }
+
+    @PostMapping("/fcm-token")
+    public ResponseEntity<?> updateFcmToken(
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody java.util.Map<String, String> request
+    ) {
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body("Giriş yapmalısınız!");
+        }
+        String fcmToken = request.get("fcmToken");
+        User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        user.setFcmToken(fcmToken);
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -1,11 +1,13 @@
 package com.diet.backend.controller;
 
+import com.diet.backend.event.DailyLogSubmittedEvent;
 import com.diet.backend.model.DailyLog;
 import com.diet.backend.model.User;
 import com.diet.backend.model.Role;
 import com.diet.backend.repository.DailyLogRepository;
 import com.diet.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +24,7 @@ public class DailyLogController {
 
     private final DailyLogRepository dailyLogRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 1. Danışan: Günlük durumunu kaydeder (Varsa günceller, yoksa ekler)
     @PostMapping
@@ -62,6 +65,7 @@ public class DailyLogController {
         }
 
         DailyLog saved = dailyLogRepository.save(dailyLog);
+        eventPublisher.publishEvent(new DailyLogSubmittedEvent(saved));
         return ResponseEntity.ok(saved);
     }
 
