@@ -86,7 +86,7 @@ public class DietitianApplicationService {
 
     public List<DietitianApplication> getPendingApplications(User adminUser) {
         validateAdmin(adminUser);
-        return applicationRepository.findByStatus(ApplicationStatus.PENDING);
+        return applicationRepository.findByStatusIn(List.of(ApplicationStatus.PENDING, ApplicationStatus.UNDER_REVIEW));
     }
 
     @Transactional

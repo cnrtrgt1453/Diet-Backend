@@ -13,4 +13,5 @@ public interface DietitianApplicationRepository extends JpaRepository<DietitianA
     Optional<DietitianApplication> findByEmail(String email);
     Optional<DietitianApplication> findByUserId(Long userId);
     List<DietitianApplication> findByStatus(ApplicationStatus status);
+    List<DietitianApplication> findByStatusIn(List<ApplicationStatus> statuses);
 }
