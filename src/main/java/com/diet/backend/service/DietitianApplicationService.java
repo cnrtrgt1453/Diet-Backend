@@ -4,6 +4,7 @@ import com.diet.backend.dto.DietitianApplicationDto;
 import com.diet.backend.model.*;
 import com.diet.backend.repository.DietitianApplicationRepository;
 import com.diet.backend.repository.UserRepository;
+import com.diet.backend.state.DietitianApplicationStateMachine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class DietitianApplicationService {
 
     private final DietitianApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final DietitianApplicationStateMachine stateMachine;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Value("${app.dietitian.email}")
@@ -32,10 +34,10 @@ public class DietitianApplicationService {
             }
         });
 
-        // Mevcut bekleyen başvurusu var mı kontrol et
+        // Mevcut bekleyen veya incelenen başvurusu var mı kontrol et
         applicationRepository.findByEmail(dto.getEmail()).ifPresent(app -> {
-            if (app.getStatus() == ApplicationStatus.PENDING) {
-                throw new RuntimeException("Zaten bekleyen bir başvurunuz bulunmaktadır.");
+            if (app.getStatus() == ApplicationStatus.PENDING || app.getStatus() == ApplicationStatus.UNDER_REVIEW) {
+                throw new RuntimeException("Zaten aktif bir başvurunuz bulunmaktadır.");
             }
         });
 
@@ -88,25 +90,45 @@ public class DietitianApplicationService {
     }
 
     @Transactional
+    public DietitianApplication startReview(Long id, User adminUser) {
+        validateAdmin(adminUser);
+
+        DietitianApplication application = applicationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Başvuru bulunamadı."));
+
+        // Durum makinesini çalıştır (PENDING -> UNDER_REVIEW)
+        ApplicationStatus nextStatus = stateMachine.transition(application.getStatus(), ApplicationStatus.UNDER_REVIEW);
+        
+        // Kullanıcı durumunu güncelle
+        User user = application.getUser();
+        user.setDietitianApplicationStatus(nextStatus);
+        userRepository.save(user);
+
+        // Başvuruyu güncelle
+        application.setStatus(nextStatus);
+        
+        return applicationRepository.save(application);
+    }
+
+    @Transactional
     public DietitianApplication approveApplication(Long id, User adminUser) {
         validateAdmin(adminUser);
 
         DietitianApplication application = applicationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Başvuru bulunamadı."));
 
-        if (application.getStatus() != ApplicationStatus.PENDING) {
-            throw new RuntimeException("Yalnızca beklemedeki başvurular onaylanabilir.");
-        }
+        // Durum makinesini çalıştır (UNDER_REVIEW -> APPROVED)
+        ApplicationStatus nextStatus = stateMachine.transition(application.getStatus(), ApplicationStatus.APPROVED);
 
         // Kullanıcının rolünü diyetisyen olarak güncelle
         User user = application.getUser();
         user.setRole(Role.ROLE_DIETITIAN);
         user.setDietitian(null); // Kendi diyetisyen atamasını kaldır
-        user.setDietitianApplicationStatus(ApplicationStatus.APPROVED);
+        user.setDietitianApplicationStatus(nextStatus);
         userRepository.save(user);
 
         // Başvuruyu güncelle
-        application.setStatus(ApplicationStatus.APPROVED);
+        application.setStatus(nextStatus);
         application.setProcessedAt(LocalDateTime.now());
 
         return applicationRepository.save(application);
@@ -119,18 +141,17 @@ public class DietitianApplicationService {
         DietitianApplication application = applicationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Başvuru bulunamadı."));
 
-        if (application.getStatus() != ApplicationStatus.PENDING) {
-            throw new RuntimeException("Yalnızca beklemedeki başvurular reddedilebilir.");
-        }
+        // Durum makinesini çalıştır (UNDER_REVIEW -> REJECTED)
+        ApplicationStatus nextStatus = stateMachine.transition(application.getStatus(), ApplicationStatus.REJECTED);
 
         // Kullanıcının durumunu güncelle
         User user = application.getUser();
-        user.setDietitianApplicationStatus(ApplicationStatus.REJECTED);
+        user.setDietitianApplicationStatus(nextStatus);
         user.setDietitianRejectionReason(reason);
         userRepository.save(user);
 
         // Başvuruyu güncelle
-        application.setStatus(ApplicationStatus.REJECTED);
+        application.setStatus(nextStatus);
         application.setRejectionReason(reason);
         application.setProcessedAt(LocalDateTime.now());
 

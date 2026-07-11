@@ -41,6 +41,17 @@ public class DietitianApplicationController {
         }
     }
 
+    // Başvuruyu İncelemeye Al (Admin Yetkili)
+    @PostMapping("/admin/applications/{id}/start-review")
+    public ResponseEntity<?> startReview(@PathVariable Long id, @AuthenticationPrincipal User adminUser) {
+        try {
+            DietitianApplication application = applicationService.startReview(id, adminUser);
+            return ResponseEntity.ok(application);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
+
     // Başvuru Onayla (Admin Yetkili)
     @PostMapping("/admin/applications/{id}/approve")
     public ResponseEntity<?> approveApplication(@PathVariable Long id, @AuthenticationPrincipal User adminUser) {
