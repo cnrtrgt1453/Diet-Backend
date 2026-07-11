@@ -50,4 +50,7 @@ public class DailyLog {
     private Double insulinLevel;
     private Integer cycleDay;
     private Integer insulinCravingLevel;
+    
+    // Fiziksel Aktivite Parametresi
+    private Integer physicalActivityMinutes;
 }

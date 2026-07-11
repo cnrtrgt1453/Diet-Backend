@@ -198,5 +198,74 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .targetFatGrams(50)
                 .completed(false)
                 .build());
+
+        System.out.println("Seeding mock daily logs...");
+        seedDailyLogs(client1, client2, client3, client4);
+    }
+
+    private void seedDailyLogs(User c1, User c2, User c3, User c4) {
+        for (int i = 14; i >= 0; i--) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            
+            // Client 1 (GLP-1) Daily Logs
+            dailyLogRepository.save(DailyLog.builder()
+                    .client(c1)
+                    .logDate(date)
+                    .waterIntakeMl(2000.0 + (i % 3) * 500)
+                    .physicalActivityMinutes(30 + (i % 4) * 15)
+                    .glutenFreeCompliant(i % 5 != 0)
+                    .sugarFreeCompliant(i % 6 != 0)
+                    .dairyFreeCompliant(true)
+                    .processedFoodFreeCompliant(i % 4 != 0)
+                    .alcoholFreeCompliant(true)
+                    .glp1SideEffectLevel(1 + (i % 2))
+                    .glp1NauseaSeverity(1)
+                    .build());
+
+            // Client 2 (Lipedema) Daily Logs
+            dailyLogRepository.save(DailyLog.builder()
+                    .client(c2)
+                    .logDate(date)
+                    .waterIntakeMl(2500.0 + (i % 2) * 500)
+                    .physicalActivityMinutes(45 + (i % 3) * 15)
+                    .glutenFreeCompliant(true)
+                    .sugarFreeCompliant(i % 7 != 0)
+                    .dairyFreeCompliant(true)
+                    .processedFoodFreeCompliant(i % 5 != 0)
+                    .alcoholFreeCompliant(true)
+                    .lipedemaPainLevel(2 + (i % 2))
+                    .lipedemaPainLevelVas(4 + (i % 3))
+                    .build());
+
+            // Client 3 (Weight Management) Daily Logs
+            dailyLogRepository.save(DailyLog.builder()
+                    .client(c3)
+                    .logDate(date)
+                    .waterIntakeMl(3000.0 + (i % 2) * 250)
+                    .physicalActivityMinutes(60 + (i % 5) * 10)
+                    .glutenFreeCompliant(true)
+                    .sugarFreeCompliant(i % 4 != 0)
+                    .dairyFreeCompliant(true)
+                    .processedFoodFreeCompliant(i % 3 != 0)
+                    .alcoholFreeCompliant(i % 8 != 0)
+                    .build());
+
+            // Client 4 (Hormonal Balance) Daily Logs
+            dailyLogRepository.save(DailyLog.builder()
+                    .client(c4)
+                    .logDate(date)
+                    .waterIntakeMl(1500.0 + (i % 4) * 250)
+                    .physicalActivityMinutes(20 + (i % 3) * 10)
+                    .glutenFreeCompliant(i % 3 != 0)
+                    .sugarFreeCompliant(i % 3 != 0)
+                    .dairyFreeCompliant(i % 4 != 0)
+                    .processedFoodFreeCompliant(i % 5 != 0)
+                    .alcoholFreeCompliant(true)
+                    .fastingBloodGlucose(90.0 + (i % 3) * 5)
+                    .insulinLevel(12.0 - (i % 3) * 2)
+                    .cycleDay(1 + (14 - i))
+                    .insulinCravingLevel(1 + (i % 3))
+                    .build());
+        }
     }
 }
