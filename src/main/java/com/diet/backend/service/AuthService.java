@@ -51,12 +51,12 @@ public class AuthService {
 
         // Mock test kolaylığı için
         if ("mock-token-google".equals(idToken)) {
-            email = "test.google@dietapp.com";
-            name = "Diyetisyen Şüheda Terat";
+            email = "test.client.google@dietapp.com";
+            name = "Danışan Google Test";
             providerId = "google-123456789";
         } else if ("mock-token-facebook".equals(idToken)) {
-            email = "test.facebook@dietapp.com";
-            name = "Facebook Test Kullanıcısı";
+            email = "test.client.facebook@dietapp.com";
+            name = "Danışan Facebook Test";
             providerId = "facebook-123456789";
         } else {
             try {
@@ -84,8 +84,8 @@ public class AuthService {
 
         // Mock test kolaylığı için
         if ("mock-token-facebook".equals(accessToken)) {
-            email = "test.facebook@dietapp.com";
-            name = "Facebook Test Kullanıcısı";
+            email = "test.client.facebook@dietapp.com";
+            name = "Danışan Facebook Test";
             providerId = "facebook-123456789";
         } else {
             try {
