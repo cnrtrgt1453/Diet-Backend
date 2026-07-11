@@ -82,9 +82,9 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .build();
         userRepository.save(client1);
 
-        measurementRepository.save(Measurement.builder().client(client1).date(LocalDate.now().minusWeeks(2)).weight(81.2).bodyFat(34.2).muscleMass(26.5).note("İlk seans, motivasyonu yüksek.").build());
-        measurementRepository.save(Measurement.builder().client(client1).date(LocalDate.now().minusWeeks(1)).weight(79.8).bodyFat(33.5).muscleMass(26.4).note("İkinci hafta kontrolü. 0.25mg dozu 0.5mg'a çıkarıldı.").build());
-        measurementRepository.save(Measurement.builder().client(client1).date(LocalDate.now()).weight(78.5).bodyFat(32.8).muscleMass(26.6).note("En son seans. Mide bulantısı geçti.").build());
+        measurementRepository.save(Measurement.builder().client(client1).date(LocalDate.now().minusWeeks(2)).weight(81.2).bodyFat(34.2).muscleMass(26.5).ankleCircumference(22.5).calfCircumference(36.5).thighCircumference(56.0).note("İlk seans, motivasyonu yüksek.").build());
+        measurementRepository.save(Measurement.builder().client(client1).date(LocalDate.now().minusWeeks(1)).weight(79.8).bodyFat(33.5).muscleMass(26.4).ankleCircumference(22.2).calfCircumference(36.2).thighCircumference(55.4).note("İkinci hafta kontrolü. 0.25mg dozu 0.5mg'a çıkarıldı.").build());
+        measurementRepository.save(Measurement.builder().client(client1).date(LocalDate.now()).weight(78.5).bodyFat(32.8).muscleMass(26.6).ankleCircumference(22.0).calfCircumference(36.0).thighCircumference(55.0).note("En son seans. Mide bulantısı geçti.").build());
 
         dietPlanRepository.save(DietPlan.builder()
                 .client(client1)
@@ -95,6 +95,9 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .dinner("1 kase mercimek çorbası, bol yeşillikli zeytinyağlı salata")
                 .snacks("10 adet çiğ badem, 1 fincan sade filtre kahve")
                 .targetCalories(1300)
+                .targetProteinGrams(110)
+                .targetCarbsGrams(100)
+                .targetFatGrams(45)
                 .completed(true)
                 .build());
 
@@ -114,8 +117,8 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .build();
         userRepository.save(client2);
 
-        measurementRepository.save(Measurement.builder().client(client2).date(LocalDate.now().minusWeeks(1)).weight(86.5).bodyFat(38.0).muscleMass(27.0).note("Lipödem bacak ağrısı şikayeti yoğun.").build());
-        measurementRepository.save(Measurement.builder().client(client2).date(LocalDate.now()).weight(85.0).bodyFat(37.1).muscleMass(27.2).note("Glütensiz beslenme sonrası şişlikler azaldı.").build());
+        measurementRepository.save(Measurement.builder().client(client2).date(LocalDate.now().minusWeeks(1)).weight(86.5).bodyFat(38.0).muscleMass(27.0).ankleCircumference(25.0).calfCircumference(41.0).thighCircumference(63.0).note("Lipödem bacak ağrısı şikayeti yoğun.").build());
+        measurementRepository.save(Measurement.builder().client(client2).date(LocalDate.now()).weight(85.0).bodyFat(37.1).muscleMass(27.2).ankleCircumference(24.5).calfCircumference(40.2).thighCircumference(62.1).note("Glütensiz beslenme sonrası şişlikler azaldı.").build());
 
         dietPlanRepository.save(DietPlan.builder()
                 .client(client2)
@@ -126,6 +129,9 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .dinner("Izgara somon (fırında), zeytinyağlı fırın sebze (kuşkonmaz ve brüksel lahanası)")
                 .snacks("1 porsiyon ananas (bromelain etkisi için ödem atıcı), yeşil çay")
                 .targetCalories(1450)
+                .targetProteinGrams(95)
+                .targetCarbsGrams(120)
+                .targetFatGrams(60)
                 .completed(false)
                 .build());
 
@@ -143,8 +149,8 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .build();
         userRepository.save(client3);
 
-        measurementRepository.save(Measurement.builder().client(client3).date(LocalDate.now().minusWeeks(1)).weight(100.0).bodyFat(28.5).muscleMass(38.2).note("İlk ölçüm, online takip başlangıcı.").build());
-        measurementRepository.save(Measurement.builder().client(client3).date(LocalDate.now()).weight(98.2).bodyFat(27.6).muscleMass(38.5).note("İyi gidiyor, su tüketimi 3 litreye çıkarıldı.").build());
+        measurementRepository.save(Measurement.builder().client(client3).date(LocalDate.now().minusWeeks(1)).weight(100.0).bodyFat(28.5).muscleMass(38.2).ankleCircumference(23.5).calfCircumference(39.0).thighCircumference(60.0).note("İlk ölçüm, online takip başlangıcı.").build());
+        measurementRepository.save(Measurement.builder().client(client3).date(LocalDate.now()).weight(98.2).bodyFat(27.6).muscleMass(38.5).ankleCircumference(23.0).calfCircumference(38.2).thighCircumference(59.1).note("İyi gidiyor, su tüketimi 3 litreye çıkarıldı.").build());
 
         dietPlanRepository.save(DietPlan.builder()
                 .client(client3)
@@ -155,6 +161,9 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .dinner("150g zeytinyağlı nohut yemeği, 4 yemek kaşığı bulgur pilavı, cacık")
                 .snacks("1 adet muz, 1 avuç çiğ kabak çekirdeği")
                 .targetCalories(1800)
+                .targetProteinGrams(140)
+                .targetCarbsGrams(160)
+                .targetFatGrams(65)
                 .completed(true)
                 .build());
 
@@ -173,7 +182,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .build();
         userRepository.save(client4);
 
-        measurementRepository.save(Measurement.builder().client(client4).date(LocalDate.now()).weight(68.0).bodyFat(31.5).muscleMass(22.8).note("Başlangıç ölçümü yapıldı, tatlı krizleri yoğun.").build());
+        measurementRepository.save(Measurement.builder().client(client4).date(LocalDate.now()).weight(68.0).bodyFat(31.5).muscleMass(22.8).ankleCircumference(21.5).calfCircumference(34.0).thighCircumference(52.0).note("Başlangıç ölçümü yapıldı, tatlı krizleri yoğun.").build());
 
         dietPlanRepository.save(DietPlan.builder()
                 .client(client4)
@@ -184,6 +193,9 @@ public class DatabaseInitializer implements CommandLineRunner {
                 .dinner("Fırında kıymalı kabak yemeği, 1 kase ev yapımı kefir")
                 .snacks("1 adet taze incir, 2 adet tam ceviz içi, melisa çayı")
                 .targetCalories(1400)
+                .targetProteinGrams(100)
+                .targetCarbsGrams(120)
+                .targetFatGrams(50)
                 .completed(false)
                 .build());
     }

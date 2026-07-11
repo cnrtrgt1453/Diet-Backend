@@ -44,11 +44,23 @@ public class DailyLogController {
             dailyLog.setWaterIntakeMl(logRequest.getWaterIntakeMl());
             dailyLog.setGlp1SideEffectLevel(logRequest.getGlp1SideEffectLevel());
             dailyLog.setGlp1SideEffects(logRequest.getGlp1SideEffects());
+            dailyLog.setGlp1NauseaSeverity(logRequest.getGlp1NauseaSeverity());
+            dailyLog.setGlp1ConstipationSeverity(logRequest.getGlp1ConstipationSeverity());
+            dailyLog.setGlp1DiarrheaSeverity(logRequest.getGlp1DiarrheaSeverity());
+            dailyLog.setGlp1Vomiting(logRequest.getGlp1Vomiting());
+            dailyLog.setGlp1InjectionSite(logRequest.getGlp1InjectionSite());
             dailyLog.setLipedemaPainLevel(logRequest.getLipedemaPainLevel());
+            dailyLog.setLipedemaPainLevelVas(logRequest.getLipedemaPainLevelVas());
             dailyLog.setGlutenFreeCompliant(logRequest.getGlutenFreeCompliant());
             dailyLog.setSugarFreeCompliant(logRequest.getSugarFreeCompliant());
             dailyLog.setDairyFreeCompliant(logRequest.getDairyFreeCompliant());
+            dailyLog.setProcessedFoodFreeCompliant(logRequest.getProcessedFoodFreeCompliant());
+            dailyLog.setAlcoholFreeCompliant(logRequest.getAlcoholFreeCompliant());
             dailyLog.setCurrentHormonalPhase(logRequest.getCurrentHormonalPhase());
+            dailyLog.setFastingBloodGlucose(logRequest.getFastingBloodGlucose());
+            dailyLog.setInsulinLevel(logRequest.getInsulinLevel());
+            dailyLog.setCycleDay(logRequest.getCycleDay());
+            dailyLog.setInsulinCravingLevel(logRequest.getInsulinCravingLevel());
         } else {
             dailyLog = DailyLog.builder()
                     .client(client)
@@ -56,11 +68,23 @@ public class DailyLogController {
                     .waterIntakeMl(logRequest.getWaterIntakeMl())
                     .glp1SideEffectLevel(logRequest.getGlp1SideEffectLevel())
                     .glp1SideEffects(logRequest.getGlp1SideEffects())
+                    .glp1NauseaSeverity(logRequest.getGlp1NauseaSeverity())
+                    .glp1ConstipationSeverity(logRequest.getGlp1ConstipationSeverity())
+                    .glp1DiarrheaSeverity(logRequest.getGlp1DiarrheaSeverity())
+                    .glp1Vomiting(logRequest.getGlp1Vomiting())
+                    .glp1InjectionSite(logRequest.getGlp1InjectionSite())
                     .lipedemaPainLevel(logRequest.getLipedemaPainLevel())
+                    .lipedemaPainLevelVas(logRequest.getLipedemaPainLevelVas())
                     .glutenFreeCompliant(logRequest.getGlutenFreeCompliant())
                     .sugarFreeCompliant(logRequest.getSugarFreeCompliant())
                     .dairyFreeCompliant(logRequest.getDairyFreeCompliant())
+                    .processedFoodFreeCompliant(logRequest.getProcessedFoodFreeCompliant())
+                    .alcoholFreeCompliant(logRequest.getAlcoholFreeCompliant())
                     .currentHormonalPhase(logRequest.getCurrentHormonalPhase())
+                    .fastingBloodGlucose(logRequest.getFastingBloodGlucose())
+                    .insulinLevel(logRequest.getInsulinLevel())
+                    .cycleDay(logRequest.getCycleDay())
+                    .insulinCravingLevel(logRequest.getInsulinCravingLevel())
                     .build();
         }
 

@@ -39,6 +39,9 @@ public class DietPlan {
     private String snacks;
 
     private Integer targetCalories;
+    private Integer targetProteinGrams;
+    private Integer targetCarbsGrams;
+    private Integer targetFatGrams;
 
     @Builder.Default
     private Boolean completed = false;

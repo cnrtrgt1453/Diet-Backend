@@ -27,6 +27,10 @@ public class Measurement {
     private Double weight;
     private Double bodyFat;
     private Double muscleMass;
+    
+    private Double ankleCircumference;
+    private Double calfCircumference;
+    private Double thighCircumference;
 
     @Column(columnDefinition = "TEXT")
     private String note;

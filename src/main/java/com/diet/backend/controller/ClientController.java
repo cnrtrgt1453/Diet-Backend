@@ -187,6 +187,9 @@ public class ClientController {
                 .weight(measurementRequest.getWeight())
                 .bodyFat(measurementRequest.getBodyFat())
                 .muscleMass(measurementRequest.getMuscleMass())
+                .ankleCircumference(measurementRequest.getAnkleCircumference())
+                .calfCircumference(measurementRequest.getCalfCircumference())
+                .thighCircumference(measurementRequest.getThighCircumference())
                 .note(measurementRequest.getNote())
                 .build();
 
@@ -234,6 +237,9 @@ public class ClientController {
                 .dinner(dietPlanRequest.getDinner())
                 .snacks(dietPlanRequest.getSnacks())
                 .targetCalories(dietPlanRequest.getTargetCalories())
+                .targetProteinGrams(dietPlanRequest.getTargetProteinGrams())
+                .targetCarbsGrams(dietPlanRequest.getTargetCarbsGrams())
+                .targetFatGrams(dietPlanRequest.getTargetFatGrams())
                 .completed(false)
                 .build();
 
