@@ -2,6 +2,7 @@ package com.diet.backend.controller;
 
 import com.diet.backend.dto.JwtAuthResponse;
 import com.diet.backend.dto.TokenRequest;
+import com.diet.backend.model.Provider;
 import com.diet.backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +13,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthService authService; // Interface'e bağımlı (ISP)
 
     @PostMapping("/google")
     public ResponseEntity<JwtAuthResponse> loginWithGoogle(@RequestBody TokenRequest tokenRequest) {
-        String token = authService.loginWithGoogle(tokenRequest.getToken());
+        String token = authService.loginWithSocial(Provider.GOOGLE, tokenRequest.getToken());
         return ResponseEntity.ok(JwtAuthResponse.builder()
                 .accessToken(token)
                 .build());
@@ -24,16 +25,17 @@ public class AuthController {
 
     @PostMapping("/facebook")
     public ResponseEntity<JwtAuthResponse> loginWithFacebook(@RequestBody TokenRequest tokenRequest) {
-        String token = authService.loginWithFacebook(tokenRequest.getToken());
+        String token = authService.loginWithSocial(Provider.FACEBOOK, tokenRequest.getToken());
         return ResponseEntity.ok(JwtAuthResponse.builder()
                 .accessToken(token)
                 .build());
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginWithEmailAndPassword(@RequestBody com.diet.backend.dto.LoginRequest loginRequest) {
         try {
             String token = authService.loginWithEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
-            return ResponseEntity.ok(com.diet.backend.dto.JwtAuthResponse.builder()
+            return ResponseEntity.ok(JwtAuthResponse.builder()
                     .accessToken(token)
                     .build());
         } catch (Exception e) {
