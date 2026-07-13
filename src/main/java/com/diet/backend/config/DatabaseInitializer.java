@@ -23,6 +23,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     private final DailyLogRepository dailyLogRepository;
     private final MessageRepository messageRepository;
     private final NotificationRepository notificationRepository;
+    private final ClientDietitianHistoryRepository clientDietitianHistoryRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.dietitian.email}")
@@ -41,6 +42,7 @@ public class DatabaseInitializer implements CommandLineRunner {
             appointmentRepository.deleteAll();
             dailyLogRepository.deleteAll();
             dietPlanRepository.deleteAll();
+            clientDietitianHistoryRepository.deleteAll();
             dietitianConnectionRequestRepository.deleteAll();
             dietitianApplicationRepository.deleteAll();
             userRepository.deleteAll();
