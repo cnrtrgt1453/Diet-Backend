@@ -61,9 +61,9 @@ public class DatabaseInitializer implements CommandLineRunner {
                     .build();
             userRepository.save(adminDietitian);
 
-            System.out.println("Seeding mock clients...");
-            seedMockClients(adminDietitian);
-            System.out.println("Database initialization completed successfully!");
+            // System.out.println("Seeding mock clients...");
+            // seedMockClients(adminDietitian);
+            System.out.println("Database initialization completed successfully (only admin dietitian seeded)!");
         }
     }
 
