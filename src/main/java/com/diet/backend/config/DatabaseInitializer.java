@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDate;
 
@@ -25,6 +26,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     private final NotificationRepository notificationRepository;
     private final ClientDietitianHistoryRepository clientDietitianHistoryRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     @Value("${app.dietitian.email}")
     private String dietitianEmail;
@@ -34,6 +36,16 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Drop outdated check constraints on startup
+        try {
+            System.out.println("Dropping old dietitian application status check constraints if they exist...");
+            jdbcTemplate.execute("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_dietitian_application_status_check");
+            jdbcTemplate.execute("ALTER TABLE dietitian_applications DROP CONSTRAINT IF EXISTS dietitian_applications_status_check");
+            System.out.println("Dropped old dietitian application status check constraints successfully.");
+        } catch (Exception e) {
+            System.err.println("Failed to drop check constraints: " + e.getMessage());
+        }
+
         if (initClean || userRepository.findByEmail(dietitianEmail).isEmpty()) {
             System.out.println("Cleaning database...");
             notificationRepository.deleteAll();
