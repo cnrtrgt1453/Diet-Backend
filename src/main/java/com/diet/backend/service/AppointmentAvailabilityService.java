@@ -16,4 +16,8 @@ public interface AppointmentAvailabilityService {
 
     // Danışan: Boş slot üzerinden randevu rezerve eder
     Appointment bookAppointmentBySlot(Long slotId, String note, User client);
+
+    List<DietitianAvailability> getDietitianUpcomingSlots(Long dietitianId);
+
+    void deleteAvailabilitySlot(Long slotId, Long dietitianId);
 }

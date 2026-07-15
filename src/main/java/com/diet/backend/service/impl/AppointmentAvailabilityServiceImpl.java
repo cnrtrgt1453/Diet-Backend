@@ -92,4 +92,25 @@ public class AppointmentAvailabilityServiceImpl implements AppointmentAvailabili
         eventPublisher.publishEvent(new AppointmentStatusChangedEvent(saved));
         return saved;
     }
+
+    @Override
+    public List<DietitianAvailability> getDietitianUpcomingSlots(Long dietitianId) {
+        return availabilityRepository.findByDietitianIdAndDateGreaterThanEqualAndIsBookedOrderByDateAscStartTimeAsc(
+                dietitianId, LocalDate.now(), false
+        );
+    }
+
+    @Override
+    @Transactional
+    public void deleteAvailabilitySlot(Long slotId, Long dietitianId) {
+        DietitianAvailability slot = availabilityRepository.findById(slotId)
+                .orElseThrow(() -> new ResourceNotFoundException("Slot bulunamadı."));
+        if (!slot.getDietitian().getId().equals(dietitianId)) {
+            throw new IllegalArgumentException("Bu slotu silme yetkiniz bulunmamaktadır.");
+        }
+        if (Boolean.TRUE.equals(slot.getIsBooked())) {
+            throw new IllegalArgumentException("Rezerve edilmiş slotlar silinemez.");
+        }
+        availabilityRepository.delete(slot);
+    }
 }

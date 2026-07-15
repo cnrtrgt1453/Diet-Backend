@@ -60,6 +60,28 @@ public class AppointmentAvailabilityController {
         return ResponseEntity.ok(appointment);
     }
 
+    // Diyetisyen: Giriş yapan diyetisyenin yaklaşan boş slotlarını listeler
+    @GetMapping("/availability/my-slots")
+    public ResponseEntity<List<DietitianAvailability>> getMySlots() {
+        User dietitian = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (dietitian.getRole() != Role.ROLE_DIETITIAN) {
+            return ResponseEntity.status(403).body(null);
+        }
+        List<DietitianAvailability> slots = availabilityService.getDietitianUpcomingSlots(dietitian.getId());
+        return ResponseEntity.ok(slots);
+    }
+
+    // Diyetisyen: Belirli bir boş slotu siler
+    @DeleteMapping("/availability/{slotId}")
+    public ResponseEntity<?> deleteAvailabilitySlot(@PathVariable Long slotId) {
+        User dietitian = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (dietitian.getRole() != Role.ROLE_DIETITIAN) {
+            return ResponseEntity.status(403).body("Yalnızca diyetisyenler çalışma slotu silebilir.");
+        }
+        availabilityService.deleteAvailabilitySlot(slotId, dietitian.getId());
+        return ResponseEntity.ok().build();
+    }
+
     @Data
     public static class BookingRequest {
         private String note;

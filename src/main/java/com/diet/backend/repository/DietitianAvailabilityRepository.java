@@ -14,4 +14,7 @@ public interface DietitianAvailabilityRepository extends JpaRepository<Dietitian
 
     // Diyetisyenin ilgili tarihteki tüm slotlarını listeler
     List<DietitianAvailability> findByDietitianIdAndDate(Long dietitianId, LocalDate date);
+
+    // Diyetisyenin bugünden itibaren tüm boş slotlarını listeler
+    List<DietitianAvailability> findByDietitianIdAndDateGreaterThanEqualAndIsBookedOrderByDateAscStartTimeAsc(Long dietitianId, LocalDate date, Boolean isBooked);
 }
