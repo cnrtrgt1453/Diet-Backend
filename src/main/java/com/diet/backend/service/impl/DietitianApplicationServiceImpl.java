@@ -3,8 +3,10 @@ package com.diet.backend.service.impl;
 import com.diet.backend.dto.DietitianApplicationDto;
 import com.diet.backend.model.*;
 import com.diet.backend.repository.DietitianApplicationRepository;
+import com.diet.backend.repository.NotificationRepository;
 import com.diet.backend.repository.UserRepository;
 import com.diet.backend.service.DietitianApplicationService;
+import com.diet.backend.service.FcmService;
 import com.diet.backend.state.DietitianApplicationStateMachine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,8 @@ public class DietitianApplicationServiceImpl implements DietitianApplicationServ
     private final UserRepository userRepository;
     private final DietitianApplicationStateMachine stateMachine;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationRepository notificationRepository;
+    private final FcmService fcmService;
 
     @Value("${app.dietitian.email}")
     private String adminEmail;
@@ -83,7 +87,28 @@ public class DietitianApplicationServiceImpl implements DietitianApplicationServ
         application.setCreatedAt(LocalDateTime.now());
         application.setProcessedAt(null);
 
-        return applicationRepository.save(application);
+        DietitianApplication savedApp = applicationRepository.save(application);
+
+        // Admin kullanıcısına bildirim gönder
+        userRepository.findByEmail(adminEmail).ifPresent(adminUser -> {
+            Notification notification = Notification.builder()
+                    .recipient(adminUser)
+                    .title("Yeni Diyetisyen Başvurusu")
+                    .message(String.format("%s yeni bir diyetisyen başvurusu yaptı.", savedApp.getFullName()))
+                    .isRead(false)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            notificationRepository.save(notification);
+
+            // FCM Push Bildirimi Gönder
+            try {
+                fcmService.sendPushNotification(adminUser.getFcmToken(), notification.getTitle(), notification.getMessage());
+            } catch (Exception e) {
+                System.err.println("FCM bildirim hatası: " + e.getMessage());
+            }
+        });
+
+        return savedApp;
     }
 
     @Override
