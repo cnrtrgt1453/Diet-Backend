@@ -69,6 +69,8 @@ public class DatabaseInitializer implements CommandLineRunner {
                     .instagramUrl("https://instagram.com/suhedaterat")
                     .linkedinUrl("https://linkedin.com/in/suhedaterat")
                     .youtubeUrl("https://youtube.com/@suhedaterat")
+                    .xUrl("https://x.com/suhedaterat")
+                    .facebookUrl("https://facebook.com/suhedaterat")
                     .profilePictureUrl("https://images.unsplash.com/photo-1594824813573-246434de83fb?q=80&w=256&auto=format&fit=crop")
                     .build();
             userRepository.save(adminDietitian);

@@ -34,6 +34,8 @@ public class UserController {
             user.setInstagramUrl(request.getInstagramUrl());
             user.setLinkedinUrl(request.getLinkedinUrl());
             user.setYoutubeUrl(request.getYoutubeUrl());
+            user.setXUrl(request.getXUrl());
+            user.setFacebookUrl(request.getFacebookUrl());
             user.setProfilePictureUrl(request.getProfilePictureUrl());
             if (request.getNotes() != null) user.setNotes(request.getNotes());
             

@@ -22,6 +22,8 @@ public class ProfileUpdateRequest {
     private String instagramUrl;
     private String linkedinUrl;
     private String youtubeUrl;
+    private String xUrl;
+    private String facebookUrl;
     private String notes;
     private String profilePictureUrl;
 }

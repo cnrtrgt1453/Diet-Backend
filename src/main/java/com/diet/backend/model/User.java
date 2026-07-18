@@ -71,6 +71,8 @@ public class User implements UserDetails {
     private String instagramUrl;
     private String linkedinUrl;
     private String youtubeUrl;
+    private String xUrl;
+    private String facebookUrl;
     private String profilePictureUrl;
 
     private String fcmToken;
