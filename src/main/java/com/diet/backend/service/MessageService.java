@@ -16,4 +16,6 @@ public interface MessageService {
     Message sendPrivateMessage(User sender, Long recipientId, String content);
 
     Message sendBroadcastMessage(User dietitian, String content);
+
+    List<com.diet.backend.dto.ConversationSummary> getInbox(User currentUser);
 }

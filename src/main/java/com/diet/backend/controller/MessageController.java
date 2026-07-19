@@ -17,6 +17,16 @@ public class MessageController {
 
     private final MessageService messageService;
 
+    @GetMapping("/inbox")
+    public ResponseEntity<List<com.diet.backend.dto.ConversationSummary>> getInbox(
+            @AuthenticationPrincipal User currentUser
+    ) {
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok(messageService.getInbox(currentUser));
+    }
+
     @GetMapping("/history/{otherUserId}")
     public ResponseEntity<List<Message>> getChatHistory(
             @AuthenticationPrincipal User currentUser,

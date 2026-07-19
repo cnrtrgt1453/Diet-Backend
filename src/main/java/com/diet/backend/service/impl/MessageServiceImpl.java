@@ -1,5 +1,6 @@
 package com.diet.backend.service.impl;
 
+import com.diet.backend.dto.ConversationSummary;
 import com.diet.backend.model.Message;
 import com.diet.backend.model.User;
 import com.diet.backend.model.Role;
@@ -8,12 +9,14 @@ import com.diet.backend.repository.MessageRepository;
 import com.diet.backend.repository.UserRepository;
 import com.diet.backend.repository.NotificationRepository;
 import com.diet.backend.service.MessageService;
+import com.diet.backend.service.FcmService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final FcmService fcmService;
 
     @Override
     public List<Message> getChatHistory(User currentUser, Long otherUserId) {
@@ -83,6 +87,15 @@ public class MessageServiceImpl implements MessageService {
                 .build();
         notificationRepository.save(notification);
 
+        // FCM Push Notification
+        if (recipient.getFcmToken() != null && !recipient.getFcmToken().isEmpty()) {
+            try {
+                fcmService.sendPushNotification(recipient.getFcmToken(), "Yeni Mesaj", sender.getName() + ": " + content);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+
         return savedMessage;
     }
 
@@ -114,8 +127,66 @@ public class MessageServiceImpl implements MessageService {
                     .createdAt(LocalDateTime.now())
                     .build();
             notificationRepository.save(notification);
+
+            // FCM Push Notification
+            if (client.getFcmToken() != null && !client.getFcmToken().isEmpty()) {
+                try {
+                    fcmService.sendPushNotification(client.getFcmToken(), "Diyetisyeninizden Duyuru", content);
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
         }
 
         return savedMessage;
+    }
+
+    @Override
+    public List<ConversationSummary> getInbox(User currentUser) {
+        if (currentUser.getRole() != Role.ROLE_DIETITIAN) {
+            throw new IllegalArgumentException("Sadece diyetisyenler gelen kutusunu görebilir.");
+        }
+
+        List<User> clients = userRepository.findByDietitianIdAndRole(currentUser.getId(), Role.ROLE_USER);
+        List<ConversationSummary> inbox = new ArrayList<>();
+
+        for (User client : clients) {
+            List<Message> lastMsgs = messageRepository.findLastPrivateMessage(currentUser, client);
+            String lastMsgText = null;
+            LocalDateTime lastMsgTime = null;
+            if (!lastMsgs.isEmpty()) {
+                Message last = lastMsgs.get(0);
+                lastMsgText = last.getContent();
+                lastMsgTime = last.getSentAt();
+            }
+
+            long unreadCount = messageRepository.countUnreadMessages(client, currentUser);
+
+            inbox.add(ConversationSummary.builder()
+                    .partnerId(client.getId())
+                    .partnerName(client.getName())
+                    .partnerEmail(client.getEmail())
+                    .partnerCategory(client.getCategory() != null ? client.getCategory().name() : null)
+                    .lastMessage(lastMsgText)
+                    .lastMessageSentAt(lastMsgTime)
+                    .unreadCount(unreadCount)
+                    .build());
+        }
+
+        // Sort by last message date descending, placing conversations with messages first
+        inbox.sort((c1, c2) -> {
+            if (c1.getLastMessageSentAt() == null && c2.getLastMessageSentAt() == null) {
+                return 0;
+            }
+            if (c1.getLastMessageSentAt() == null) {
+                return 1;
+            }
+            if (c2.getLastMessageSentAt() == null) {
+                return -1;
+            }
+            return c2.getLastMessageSentAt().compareTo(c1.getLastMessageSentAt());
+        });
+
+        return inbox;
     }
 }

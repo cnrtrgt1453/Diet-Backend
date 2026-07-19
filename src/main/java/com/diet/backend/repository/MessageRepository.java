@@ -19,4 +19,14 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
         @Param("user2") User user2, 
         @Param("dietitian") User dietitian
     );
+
+    @Query("SELECT m FROM Message m WHERE " +
+           "((m.sender = :user1 AND m.recipient = :user2) OR (m.sender = :user2 AND m.recipient = :user1)) " +
+           "AND m.isBroadcast = false " +
+           "ORDER BY m.sentAt DESC")
+    List<Message> findLastPrivateMessage(@Param("user1") User user1, @Param("user2") User user2);
+
+    @Query("SELECT COUNT(m) FROM Message m WHERE " +
+           "m.sender = :sender AND m.recipient = :recipient AND m.isRead = false AND m.isBroadcast = false")
+    long countUnreadMessages(@Param("sender") User sender, @Param("recipient") User recipient);
 }
