@@ -47,7 +47,7 @@ public class User implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dietitian_id")
     private User dietitian;
 
