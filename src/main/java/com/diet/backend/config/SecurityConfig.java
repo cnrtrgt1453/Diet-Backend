@@ -37,6 +37,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**", "/ws/chat/**", "/ws/chat", "/api/v1/users/profile-picture/**").permitAll()
+                .requestMatchers("/api/v1/analytics/dietitian/**").hasRole("DIETITIAN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
