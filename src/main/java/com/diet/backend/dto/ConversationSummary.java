@@ -18,4 +18,5 @@ public class ConversationSummary {
     private String lastMessage;
     private LocalDateTime lastMessageSentAt;
     private long unreadCount;
+    private String profilePictureUrl;
 }

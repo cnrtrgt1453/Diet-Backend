@@ -145,8 +145,24 @@ public class MessageServiceImpl implements MessageService {
     public List<ConversationSummary> getInbox(User currentUser) {
         if (currentUser.getRole() == Role.ROLE_USER) {
             List<ConversationSummary> inbox = new ArrayList<>();
-            User dietitian = currentUser.getDietitian();
-            if (dietitian != null) {
+            List<Long> dietitianIds = messageRepository.findChatPartners(currentUser.getId());
+            List<User> dietitians = new ArrayList<>(userRepository.findAllById(dietitianIds));
+
+            User assignedDietitian = currentUser.getDietitian();
+            if (assignedDietitian != null) {
+                boolean exists = false;
+                for (User d : dietitians) {
+                    if (d.getId().equals(assignedDietitian.getId())) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    dietitians.add(assignedDietitian);
+                }
+            }
+
+            for (User dietitian : dietitians) {
                 List<Message> lastMsgs = messageRepository.findLastPrivateMessage(currentUser, dietitian);
                 String lastMsgText = null;
                 LocalDateTime lastMsgTime = null;
@@ -166,8 +182,23 @@ public class MessageServiceImpl implements MessageService {
                         .lastMessage(lastMsgText)
                         .lastMessageSentAt(lastMsgTime)
                         .unreadCount(unreadCount)
+                        .profilePictureUrl(dietitian.getProfilePictureUrl())
                         .build());
             }
+
+            inbox.sort((c1, c2) -> {
+                if (c1.getLastMessageSentAt() == null && c2.getLastMessageSentAt() == null) {
+                    return 0;
+                }
+                if (c1.getLastMessageSentAt() == null) {
+                    return 1;
+                }
+                if (c2.getLastMessageSentAt() == null) {
+                    return -1;
+                }
+                return c2.getLastMessageSentAt().compareTo(c1.getLastMessageSentAt());
+            });
+
             return inbox;
         }
 

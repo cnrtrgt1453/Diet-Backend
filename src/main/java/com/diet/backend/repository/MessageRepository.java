@@ -8,6 +8,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
+
+    @Query("SELECT DISTINCT CASE WHEN m.sender.id = :userId THEN m.recipient.id ELSE m.sender.id END " +
+           "FROM Message m WHERE (m.sender.id = :userId OR m.recipient.id = :userId) AND m.isBroadcast = false")
+    List<Long> findChatPartners(@Param("userId") Long userId);
     
     @Query("SELECT m FROM Message m WHERE " +
            "(m.sender = :user1 AND m.recipient = :user2 AND m.isBroadcast = false) OR " +
