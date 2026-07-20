@@ -46,6 +46,14 @@ public class DatabaseInitializer implements CommandLineRunner {
             System.err.println("Failed to drop check constraints: " + e.getMessage());
         }
 
+        // Clean default test messages
+        try {
+            jdbcTemplate.execute("DELETE FROM messages WHERE content LIKE '%test%' OR content LIKE '%Diyetisyenim%'");
+            System.out.println("Cleaned up default test messages from database.");
+        } catch (Exception e) {
+            System.err.println("Failed to clean test messages: " + e.getMessage());
+        }
+
         if (initClean || userRepository.findByEmail(dietitianEmail).isEmpty()) {
             System.out.println("Cleaning database...");
             notificationRepository.deleteAll();
