@@ -143,8 +143,36 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<ConversationSummary> getInbox(User currentUser) {
+        if (currentUser.getRole() == Role.ROLE_USER) {
+            List<ConversationSummary> inbox = new ArrayList<>();
+            User dietitian = currentUser.getDietitian();
+            if (dietitian != null) {
+                List<Message> lastMsgs = messageRepository.findLastPrivateMessage(currentUser, dietitian);
+                String lastMsgText = null;
+                LocalDateTime lastMsgTime = null;
+                if (!lastMsgs.isEmpty()) {
+                    Message last = lastMsgs.get(0);
+                    lastMsgText = last.getContent();
+                    lastMsgTime = last.getSentAt();
+                }
+
+                long unreadCount = messageRepository.countUnreadMessages(dietitian, currentUser);
+
+                inbox.add(ConversationSummary.builder()
+                        .partnerId(dietitian.getId())
+                        .partnerName(dietitian.getName())
+                        .partnerEmail(dietitian.getEmail())
+                        .partnerCategory(null)
+                        .lastMessage(lastMsgText)
+                        .lastMessageSentAt(lastMsgTime)
+                        .unreadCount(unreadCount)
+                        .build());
+            }
+            return inbox;
+        }
+
         if (currentUser.getRole() != Role.ROLE_DIETITIAN) {
-            throw new IllegalArgumentException("Sadece diyetisyenler gelen kutusunu görebilir.");
+            throw new IllegalArgumentException("Sadece diyetisyenler ve danışanlar gelen kutusunu görebilir.");
         }
 
         List<User> clients = userRepository.findByDietitianIdAndRole(currentUser.getId(), Role.ROLE_USER);
