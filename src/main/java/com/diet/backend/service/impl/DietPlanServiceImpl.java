@@ -1,8 +1,10 @@
 package com.diet.backend.service.impl;
 
 import com.diet.backend.event.DietPlanAssignedEvent;
+import com.diet.backend.exception.AccessDeniedException;
 import com.diet.backend.exception.ResourceNotFoundException;
 import com.diet.backend.model.DietPlan;
+import com.diet.backend.model.Role;
 import com.diet.backend.model.User;
 import com.diet.backend.repository.DietPlanRepository;
 import com.diet.backend.repository.UserRepository;
@@ -25,9 +27,18 @@ public class DietPlanServiceImpl implements DietPlanService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    public List<DietPlan> getClientDiets(Long clientId, User dietitian) {
+    public List<DietPlan> getClientDiets(Long clientId, User loggedInUser) {
         Optional<User> clientOpt = userRepository.findById(clientId);
-        if (clientOpt.isEmpty() || !clientOpt.get().getDietitian().getId().equals(dietitian.getId())) {
+        if (clientOpt.isEmpty()) {
+            throw new ResourceNotFoundException("Danışan bulunamadı.");
+        }
+        User client = clientOpt.get();
+        boolean isDietitian = loggedInUser.getRole() == Role.ROLE_DIETITIAN && 
+                client.getDietitian() != null && 
+                client.getDietitian().getId().equals(loggedInUser.getId());
+        boolean isSelf = loggedInUser.getId().equals(clientId);
+
+        if (!isDietitian && !isSelf) {
             throw new ResourceNotFoundException("Danışan bulunamadı veya yetkiniz yok.");
         }
 
