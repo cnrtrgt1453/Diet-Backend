@@ -32,10 +32,7 @@ public class MessageServiceImpl implements MessageService {
         User otherUser = userRepository.findById(otherUserId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        User dietitian = currentUser.getRole() == Role.ROLE_DIETITIAN ? currentUser : currentUser.getDietitian();
-        if (dietitian == null) {
-            dietitian = otherUser;
-        }
+        User dietitian = currentUser.getRole() == Role.ROLE_DIETITIAN ? currentUser : otherUser;
 
         List<Message> history = messageRepository.findChatHistory(currentUser, otherUser, dietitian);
 
@@ -56,15 +53,12 @@ public class MessageServiceImpl implements MessageService {
         User recipient = userRepository.findById(recipientId)
                 .orElseThrow(() -> new RuntimeException("Alıcı bulunamadı"));
 
-        // Validate dietitian/client association
-        if (sender.getRole() == Role.ROLE_USER) {
-            if (sender.getDietitian() == null || !sender.getDietitian().getId().equals(recipient.getId())) {
-                throw new RuntimeException("Sadece kendi diyetisyeninize mesaj gönderebilirsiniz");
-            }
-        } else if (sender.getRole() == Role.ROLE_DIETITIAN) {
-            if (recipient.getDietitian() == null || !recipient.getDietitian().getId().equals(sender.getId())) {
-                throw new RuntimeException("Sadece kendinize bağlı danışanlara mesaj gönderebilirsiniz");
-            }
+        // Validate role matches for messaging
+        if (sender.getRole() == Role.ROLE_USER && recipient.getRole() != Role.ROLE_DIETITIAN) {
+            throw new RuntimeException("Danışanlar sadece diyetisyenlere mesaj gönderebilir.");
+        }
+        if (sender.getRole() == Role.ROLE_DIETITIAN && recipient.getRole() != Role.ROLE_USER) {
+            throw new RuntimeException("Diyetisyenler sadece danışanlara mesaj gönderebilir.");
         }
 
         Message message = Message.builder()
