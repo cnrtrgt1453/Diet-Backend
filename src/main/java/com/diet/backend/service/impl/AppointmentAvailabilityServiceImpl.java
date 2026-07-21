@@ -56,6 +56,11 @@ public class AppointmentAvailabilityServiceImpl implements AppointmentAvailabili
     }
 
     @Override
+    public List<DietitianAvailability> getAvailableSlotsInRange(Long dietitianId, LocalDate startDate, LocalDate endDate) {
+        return availabilityRepository.findByDietitianIdAndDateBetweenAndIsBookedOrderByDateAscStartTimeAsc(dietitianId, startDate, endDate, false);
+    }
+
+    @Override
     @Transactional
     public Appointment bookAppointmentBySlot(Long slotId, String note, User client) {
         if (client.getRole() != Role.ROLE_USER) {
@@ -78,14 +83,14 @@ public class AppointmentAvailabilityServiceImpl implements AppointmentAvailabili
         slot.setIsBooked(true);
         availabilityRepository.save(slot);
 
-        // Randevuyu oluştur (Slot üzerinden alındığı için doğrudan ONAYLANDI (APPROVED) yapıyoruz)
+        // Randevuyu oluştur (Yeni akışta diyetisyen onayı bekleyecek şekilde PENDING başlatılıyor)
         Appointment appointment = Appointment.builder()
                 .client(client)
                 .dietitian(slot.getDietitian())
                 .appointmentDate(slot.getDate())
                 .appointmentTime(slot.getStartTime())
                 .note(note)
-                .status(AppointmentStatus.APPROVED)
+                .status(AppointmentStatus.PENDING)
                 .build();
 
         Appointment saved = appointmentRepository.save(appointment);

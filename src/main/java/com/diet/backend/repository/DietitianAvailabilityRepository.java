@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DietitianAvailabilityRepository extends JpaRepository<DietitianAvailability, Long> {
@@ -17,4 +18,10 @@ public interface DietitianAvailabilityRepository extends JpaRepository<Dietitian
 
     // Diyetisyenin bugünden itibaren tüm boş slotlarını listeler
     List<DietitianAvailability> findByDietitianIdAndDateGreaterThanEqualAndIsBookedOrderByDateAscStartTimeAsc(Long dietitianId, LocalDate date, Boolean isBooked);
+
+    // Belirli bir tarih aralığındaki uygun (rezerve edilmemiş) slotları listeler
+    List<DietitianAvailability> findByDietitianIdAndDateBetweenAndIsBookedOrderByDateAscStartTimeAsc(Long dietitianId, LocalDate startDate, LocalDate endDate, Boolean isBooked);
+
+    // Diyetisyene, tarihe ve saate göre slot bulur
+    Optional<DietitianAvailability> findByDietitianIdAndDateAndStartTime(Long dietitianId, LocalDate date, String startTime);
 }

@@ -45,6 +45,16 @@ public class AppointmentAvailabilityController {
         return ResponseEntity.ok(slots);
     }
 
+    // Danışan/Diyetisyen: Belirli bir tarih aralığındaki boş slotları listeler
+    @GetMapping("/availability/dietitian/{dietitianId}/range")
+    public ResponseEntity<List<DietitianAvailability>> getAvailableSlotsInRange(
+            @PathVariable Long dietitianId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        List<DietitianAvailability> slots = availabilityService.getAvailableSlotsInRange(dietitianId, startDate, endDate);
+        return ResponseEntity.ok(slots);
+    }
+
     // Danışan: Boş slot üzerinden randevu rezerve eder
     @PostMapping("/book-slot/{slotId}")
     public ResponseEntity<?> bookAppointmentBySlot(

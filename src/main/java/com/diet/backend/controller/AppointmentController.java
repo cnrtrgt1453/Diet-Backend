@@ -6,6 +6,7 @@ import com.diet.backend.model.User;
 import com.diet.backend.model.Role;
 import com.diet.backend.repository.AppointmentRepository;
 import com.diet.backend.repository.UserRepository;
+import com.diet.backend.repository.DietitianAvailabilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import com.diet.backend.event.AppointmentStatusChangedEvent;
@@ -24,6 +25,7 @@ public class AppointmentController {
 
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final DietitianAvailabilityRepository availabilityRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     // 1. Danışan: Yeni randevu talebi oluşturur
@@ -102,6 +104,19 @@ public class AppointmentController {
 
         appointment.setStatus(status);
         Appointment saved = appointmentRepository.save(appointment);
+
+        // Randevu reddedilirse bağlı olduğu slotu tekrar boşa çıkar
+        if (status == AppointmentStatus.REJECTED) {
+            availabilityRepository.findByDietitianIdAndDateAndStartTime(
+                appointment.getDietitian().getId(),
+                appointment.getAppointmentDate(),
+                appointment.getAppointmentTime()
+            ).ifPresent(slot -> {
+                slot.setIsBooked(false);
+                availabilityRepository.save(slot);
+            });
+        }
+
         eventPublisher.publishEvent(new AppointmentStatusChangedEvent(saved));
         return ResponseEntity.ok(saved);
     }

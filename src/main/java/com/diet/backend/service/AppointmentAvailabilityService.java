@@ -14,6 +14,9 @@ public interface AppointmentAvailabilityService {
     // Danışan/Diyetisyen: Belirli bir tarihteki rezerve edilmemiş boş slotları listeler
     List<DietitianAvailability> getAvailableSlots(Long dietitianId, LocalDate date);
 
+    // Danışan/Diyetisyen: Belirli bir tarih aralığındaki rezerve edilmemiş boş slotları listeler
+    List<DietitianAvailability> getAvailableSlotsInRange(Long dietitianId, LocalDate startDate, LocalDate endDate);
+
     // Danışan: Boş slot üzerinden randevu rezerve eder
     Appointment bookAppointmentBySlot(Long slotId, String note, User client);
 
