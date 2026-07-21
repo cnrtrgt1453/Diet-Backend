@@ -88,7 +88,12 @@ public class AuthServiceImpl implements AuthService {
             user = userOptional.get();
             user.setProvider(provider);
             user.setProviderId(userInfo.getProviderId());
-            user.setName(userInfo.getName());
+            if (userInfo.getName() != null && (user.getName() == null || user.getName().isBlank())) {
+                user.setName(userInfo.getName());
+            }
+            if (userInfo.getPictureUrl() != null && (user.getProfilePictureUrl() == null || user.getProfilePictureUrl().isBlank())) {
+                user.setProfilePictureUrl(userInfo.getPictureUrl());
+            }
             user = userRepository.save(user);
         } else {
             User adminDietitian = userRepository.findByEmail(adminDietitianEmail).orElse(null);
@@ -98,6 +103,7 @@ public class AuthServiceImpl implements AuthService {
                     .name(userInfo.getName())
                     .provider(provider)
                     .providerId(userInfo.getProviderId())
+                    .profilePictureUrl(userInfo.getPictureUrl())
                     .role(Role.ROLE_USER)
                     .dietitian(adminDietitian)
                     .build();

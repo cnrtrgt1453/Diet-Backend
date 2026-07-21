@@ -32,11 +32,12 @@ public class FacebookAuthProvider implements SocialAuthProvider {
                     .email("test.client.facebook@dietapp.com")
                     .name("Danışan Facebook Test")
                     .providerId("facebook-123456789")
+                    .pictureUrl("https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=256&auto=format&fit=crop")
                     .build();
         }
 
         try {
-            String url = "https://graph.facebook.com/me?fields=id,name,email&access_token=" + accessToken;
+            String url = "https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=" + accessToken;
             Map<String, Object> response = httpClient.get(url);
 
             if (response.containsKey("error")) {
@@ -51,10 +52,25 @@ public class FacebookAuthProvider implements SocialAuthProvider {
                 email = providerId + "@facebook.com";
             }
 
+            String pictureUrl = null;
+            if (response.containsKey("picture") && response.get("picture") instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> pictureObj = (Map<String, Object>) response.get("picture");
+                if (pictureObj.containsKey("data") && pictureObj.get("data") instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> dataObj = (Map<String, Object>) pictureObj.get("data");
+                    pictureUrl = (String) dataObj.get("url");
+                }
+            }
+            if (pictureUrl == null && providerId != null) {
+                pictureUrl = "https://graph.facebook.com/" + providerId + "/picture?type=large";
+            }
+
             return SocialUserInfo.builder()
                     .email(email)
                     .name((String) response.get("name"))
                     .providerId(providerId)
+                    .pictureUrl(pictureUrl)
                     .build();
         } catch (RuntimeException e) {
             throw new RuntimeException("Facebook API ile iletişim kurulamadı veya geçersiz jeton: " + e.getMessage(), e);

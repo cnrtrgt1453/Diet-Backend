@@ -32,6 +32,7 @@ public class GoogleAuthProvider implements SocialAuthProvider {
                     .email("test.client.google@dietapp.com")
                     .name("Danışan Google Test")
                     .providerId("google-123456789")
+                    .pictureUrl("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop")
                     .build();
         }
 
@@ -47,6 +48,7 @@ public class GoogleAuthProvider implements SocialAuthProvider {
                     .email((String) response.get("email"))
                     .name((String) response.get("name"))
                     .providerId((String) response.get("sub"))
+                    .pictureUrl((String) response.get("picture"))
                     .build();
         } catch (RuntimeException e) {
             throw new RuntimeException("Google API ile iletişim kurulamadı veya geçersiz jeton: " + e.getMessage(), e);

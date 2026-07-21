@@ -46,6 +46,7 @@ public class UserController {
         boolean isFirstWeight = user.getCurrentWeight() == null;
 
         if (request.getName() != null) user.setName(request.getName());
+        if (request.getProfilePictureUrl() != null) user.setProfilePictureUrl(request.getProfilePictureUrl());
         user.setHeight(request.getHeight());
         user.setCurrentWeight(request.getCurrentWeight());
         user.setTargetWeight(request.getTargetWeight());

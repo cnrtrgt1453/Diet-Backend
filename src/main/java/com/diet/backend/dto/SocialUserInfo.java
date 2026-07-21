@@ -17,4 +17,5 @@ public class SocialUserInfo {
     private String email;
     private String name;
     private String providerId;
+    private String pictureUrl;
 }
